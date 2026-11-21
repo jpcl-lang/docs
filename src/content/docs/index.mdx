@@ -1,0 +1,79 @@
+---
+title: JPCL
+description: TOML's sections, JSON's nesting, neither one's ceremony. Documentation for the .jp configuration language.
+template: splash
+hero:
+  tagline: TOML's sections. JSON's nesting. Neither one's ceremony.
+  image:
+    dark: ../../assets/icon-dark.svg
+    light: ../../assets/icon-light.svg
+  actions:
+    - text: Install it
+      link: /start/installation/
+      icon: right-arrow
+    - text: Read the format
+      link: /format/syntax/
+      variant: minimal
+    - text: Upgrading from 1.x
+      link: /guides/upgrading/
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+```jp title="servers.jp"
+~~ Keys before the first header belong to the document root.
+version: 2
+
+[SERVER_ID]
+config: {
+  disabled_channels:,          ~~ empty, on purpose
+  disabled_users: [9892, 82082, 8209]
+}
+
+[SERVER_ID_2]
+prefix: "!"
+modules: {
+  moderation: true,
+  fun: false
+}
+```
+
+<CardGrid>
+  <Card title="Sections on top" icon="list-format">
+    A `[SERVER_ID]` header reads better than another brace. Headers may be
+    dotted to nest, or quoted when a name contains a dot.
+  </Card>
+  <Card title="JSON below it" icon="seti:json">
+    Inside a section it is objects and arrays, as deep as you like, in the
+    shape you already know.
+  </Card>
+  <Card title="No ceremony" icon="pencil">
+    Unquoted keys, `~~` and `~* … *~` comments anywhere, and trailing commas
+    quietly ignored.
+  </Card>
+  <Card title="Empty is a value" icon="approve-check-circle">
+    `disabled_channels:,` means the key exists and has nothing in it yet — a
+    real state in a config.
+  </Card>
+</CardGrid>
+
+## Three implementations that agree
+
+<CardGrid>
+  <LinkCard
+    title="TypeScript / JavaScript"
+    description="npm install jpcl-lang — Node 20+, Bun and Deno, with a browser-safe core."
+    href="/reference/typescript/"
+  />
+  <LinkCard
+    title="Python"
+    description="pip install jpcl — Python 3.14+, typed."
+    href="/reference/python/"
+  />
+  <LinkCard
+    title="Go"
+    description="go get github.com/jpcl-lang/jpcl/go/v2 — standard library only."
+    href="/reference/go/"
+  />
+</CardGrid>

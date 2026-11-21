@@ -1,0 +1,138 @@
+{
+  "name": "jp",
+  "scopeName": "source.jp",
+  "displayName": "JPCL",
+  "aliases": [
+    "jpcl"
+  ],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#header"
+    },
+    {
+      "include": "#key"
+    },
+    {
+      "include": "#values"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.jp",
+          "begin": "~\\*",
+          "end": "\\*~"
+        },
+        {
+          "name": "comment.line.jp",
+          "match": "~~.*$"
+        }
+      ]
+    },
+    "header": {
+      "begin": "^\\s*(\\[)",
+      "end": "(\\])",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.section.table.begin.jp"
+        }
+      },
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.section.table.end.jp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#strings"
+        },
+        {
+          "name": "entity.name.section.jp",
+          "match": "[^\\]\\.\"']+"
+        },
+        {
+          "name": "punctuation.separator.dot.jp",
+          "match": "\\."
+        }
+      ]
+    },
+    "key": {
+      "patterns": [
+        {
+          "match": "(\"(?:[^\"\\\\]|\\\\.)*\"|'(?:[^'\\\\]|\\\\.)*')\\s*(:)",
+          "captures": {
+            "1": {
+              "name": "support.type.property-name.jp"
+            },
+            "2": {
+              "name": "punctuation.separator.key-value.jp"
+            }
+          }
+        },
+        {
+          "match": "([^\\s:,{}\\[\\]\"'~][^:,{}\\[\\]\"'\\r\\n]*?)\\s*(:)",
+          "captures": {
+            "1": {
+              "name": "support.type.property-name.jp"
+            },
+            "2": {
+              "name": "punctuation.separator.key-value.jp"
+            }
+          }
+        }
+      ]
+    },
+    "values": {
+      "patterns": [
+        {
+          "include": "#strings"
+        },
+        {
+          "name": "constant.language.jp",
+          "match": "(?i)(?<![\\w.])(true|false|null|none|nil|[+-]?nan|[+-]?inf(?:inity)?)(?![\\w.])"
+        },
+        {
+          "name": "constant.numeric.jp",
+          "match": "(?<![\\w.])[+-]?(?:0[xX](?:_?[0-9a-fA-F])+|0[oO](?:_?[0-7])+|0[bB](?:_?[01])+|(?:\\d+(?:_\\d+)*(?:\\.(?:\\d+(?:_\\d+)*)?)?|\\.\\d+(?:_\\d+)*)(?:[eE][+-]?\\d+(?:_\\d+)*)?)(?![\\w.])"
+        },
+        {
+          "name": "punctuation.definition.jp",
+          "match": "[{}\\[\\],]"
+        },
+        {
+          "include": "#comments"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.jp",
+          "begin": "\"",
+          "end": "\"|$",
+          "patterns": [
+            {
+              "name": "constant.character.escape.jp",
+              "match": "\\\\(?:[\"'\\\\/0abefnrtv]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|$)"
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.jp",
+          "begin": "'",
+          "end": "'|$",
+          "patterns": [
+            {
+              "name": "constant.character.escape.jp",
+              "match": "\\\\(?:[\"'\\\\/0abefnrtv]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|$)"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

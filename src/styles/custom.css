@@ -1,0 +1,66 @@
+/* src/styles/custom.css */
+
+/* Palette and fonts from jpcl.doughmination.gay (jpcl-lang/web) */
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("/fonts/IBMPlexSans-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("/fonts/IBMPlexSans-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("/fonts/IBMPlexSans-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("/fonts/IBMPlexSans-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* Dark: kon ground, momo accent */
+:root {
+  --sl-font: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --sl-color-accent-low: #3d2533;
+  --sl-color-accent: #f596aa;
+  --sl-color-accent-high: #fedfe1;
+
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #e7eef7;
+  --sl-color-gray-2: #c4d1e0;
+  --sl-color-gray-3: #9db0c6;
+  --sl-color-gray-4: #8092aa;
+  --sl-color-gray-5: #34425a;
+  --sl-color-gray-6: #1f2a40;
+  --sl-color-black: #192236;
+}
+
+/* Light: paper ground, kurenai accent */
+:root[data-theme="light"] {
+  --sl-color-accent-low: #fedfe1;
+  --sl-color-accent: #cb1b45;
+  --sl-color-accent-high: #7a0f29;
+
+  --sl-color-white: #0f2540;
+  --sl-color-gray-1: #1d3352;
+  --sl-color-gray-2: #34425a;
+  --sl-color-gray-3: #4a5f7a;
+  --sl-color-gray-4: #617288;
+  --sl-color-gray-5: #c9d2dd;
+  --sl-color-gray-6: #eef0ea;
+  --sl-color-gray-7: #f6f5ef;
+  --sl-color-black: #fbfaf5;
+}

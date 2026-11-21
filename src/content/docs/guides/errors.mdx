@@ -1,0 +1,108 @@
+---
+title: Errors
+description: Decode and encode errors, their fields, and duplicate-key handling.
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+## Decode errors point at the character
+
+A malformed document gives the file, line and column, the source line, and a
+caret under the problem:
+
+```
+data/servers.jp:2:8: expected ':' after key 'prefix', found '"'
+    prefix "!"
+           ^
+```
+
+TypeScript and Python produce byte-identical messages. Go quotes the key Go's
+way, so it reads `after key "prefix"`.
+
+| | TypeScript | Python | Go |
+| --- | --- | --- | --- |
+| Base class | `JPError` | `JPError` | — |
+| Decode error | `JPDecodeError` | `JPDecodeError` (a `ValueError`) | `*jpcl.DecodeError` |
+| Encode error | `JPEncodeError` | `JPEncodeError` (a `TypeError`) | `*jpcl.EncodeError` |
+
+### Fields
+
+| Meaning | TypeScript | Python | Go |
+| --- | --- | --- | --- |
+| Message without location | `rawMessage` | `raw_message` | `Message` |
+| One-based line | `line` | `line` | `Line` |
+| One-based column | `col` | `col` | `Col` |
+| Zero-based offset | `pos` | `pos` | `Pos` |
+| File name, if known | `filename` | `filename` | `Filename` |
+| Full source text | `doc` | `doc` | `Doc` |
+
+<Tabs syncKey="lang">
+  <TabItem label="TypeScript">
+    ```ts
+    import { loads, JPDecodeError } from "jpcl-lang";
+
+    try {
+      loads(text, { filename: "servers.jp" });
+    } catch (error) {
+      if (error instanceof JPDecodeError) {
+        console.log(error.line, error.col, error.rawMessage);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    import jpcl
+
+    try:
+        jpcl.loads(text, filename="servers.jp")
+    except jpcl.JPDecodeError as error:
+        print(error.line, error.col, error.raw_message)
+    ```
+  </TabItem>
+  <TabItem label="Go">
+    ```go
+    _, err := jpcl.Parse(text, jpcl.ParseOptions{Filename: "servers.jp"})
+
+    var decodeErr *jpcl.DecodeError
+    if errors.As(err, &decodeErr) {
+        fmt.Println(decodeErr.Line, decodeErr.Col, decodeErr.Message)
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+## Encode errors
+
+Writing fails with an encode error for:
+
+- an unsupported type, unless you pass a `default` converter
+- a key that is not a string
+- a circular reference
+- in Go, `[]byte`, which has no `.jp` form; convert it to a string first
+
+## Duplicate keys
+
+A repeated key in one object is an error by default. You can keep the first or
+the last value instead:
+
+<Tabs syncKey="lang">
+  <TabItem label="TypeScript">
+    ```ts
+    // "error" (default), "first", "last"
+    loads(text, { duplicateKeys: "last" });
+    ```
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    # "error" (default), "first", "last"
+    jpcl.loads(text, duplicate_keys="last")
+    ```
+  </TabItem>
+  <TabItem label="Go">
+    ```go
+    // DuplicateError (default), DuplicateFirst, DuplicateLast
+    jpcl.Parse(text, jpcl.ParseOptions{DuplicateKeys: jpcl.DuplicateLast})
+    ```
+  </TabItem>
+</Tabs>

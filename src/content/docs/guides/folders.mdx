@@ -1,0 +1,71 @@
+---
+title: Loading a folder
+description: Load every .jp file in a directory, keyed by file name.
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+Each file in the folder becomes one key, named after the file without its
+`.jp` suffix.
+
+```
+data/
+├─ servers.jp
+├─ roles.jp
+└─ guilds/
+   ├─ 1234567890.jp
+   └─ 9876543210.jp
+```
+
+<Tabs syncKey="lang">
+  <TabItem label="TypeScript">
+    ```ts
+    import { loadDir } from "jpcl-lang";
+
+    // { servers: {...}, roles: {...} }
+    const config = await loadDir("data");
+
+    // { servers, roles, "guilds/1234567890", "guilds/9876543210" }
+    const everything = await loadDir("data", { recursive: true });
+
+    // Only some files
+    const examples = await loadDir("data", { pattern: "*.example.jp" });
+    ```
+
+    `loadDirSync` does the same without a promise.
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    import jpcl
+
+    # {"servers": {...}, "roles": {...}}
+    config = jpcl.load_dir("data")
+
+    everything = jpcl.load_dir("data", recursive=True)
+    examples = jpcl.load_dir("data", pattern="*.example.jp")
+    ```
+  </TabItem>
+  <TabItem label="Go">
+    ```go
+    // map[string]*jpcl.Object{"servers": ..., "roles": ...}
+    config, err := jpcl.LoadDir("data", "", false, jpcl.ParseOptions{})
+
+    // Recursive
+    everything, err := jpcl.LoadDir("data", "", true, jpcl.ParseOptions{})
+
+    // Only some files
+    examples, err := jpcl.LoadDir("data", "*.example.jp", false, jpcl.ParseOptions{})
+    ```
+
+    An empty pattern means `*.jp`. The result is a plain Go `map`, so its
+    iteration order is not meaningful.
+  </TabItem>
+</Tabs>
+
+## Rules
+
+- The default pattern is `*.jp`. It matches file names, not paths.
+- With recursion on, nested files are keyed by their relative path, using `/`
+  on every platform: `"guilds/1234567890"`.
+- A malformed file stops the whole load with a decode error naming that file.
+- Parse options such as duplicate-key handling apply to every file.

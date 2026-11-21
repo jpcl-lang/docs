@@ -1,0 +1,80 @@
+---
+title: Installation
+description: Install the JPCL library and the jpcl command for TypeScript, Python or Go.
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+JPCL has three implementations. They read and write exactly the same files, so
+pick the one that matches your project. None of them have runtime dependencies.
+
+<Tabs syncKey="lang">
+  <TabItem label="TypeScript">
+    ```bash
+    npm install jpcl-lang
+    ```
+
+    Also works with `bun add jpcl-lang`, `pnpm add jpcl-lang` and
+    `yarn add jpcl-lang`.
+
+    - Ships ESM with TypeScript types.
+    - Runs on Node 20+, Bun and Deno.
+    - `jpcl-lang/core` is a filesystem-free entry point for browsers, workers
+      and edge runtimes.
+    - Installs the `jpcl` command. Run it with `npx jpcl`.
+
+  </TabItem>
+  <TabItem label="Python">
+    ```bash
+    pip install jpcl
+    ```
+
+    Or `uv add jpcl`.
+
+    - Needs Python 3.14 or newer.
+    - Fully typed.
+    - Installs the `jpcl` command. `python -m jpcl` works too.
+
+  </TabItem>
+  <TabItem label="Go">
+    ```bash
+    go get github.com/jpcl-lang/jpcl/go/v2
+    ```
+
+    For the command line tool:
+
+    ```bash
+    go install github.com/jpcl-lang/jpcl/go/v2/cmd/jpcl@latest
+    ```
+
+    - Standard library only.
+    - The package is named `jpcl`, but the path ends in `/go/v2`, so import it
+      with an alias: `jpcl "github.com/jpcl-lang/jpcl/go/v2"`.
+    - Prebuilt binaries for Linux, macOS and Windows are attached to each
+      [`go/v*` release](https://github.com/jpcl-lang/jpcl/releases).
+
+  </TabItem>
+</Tabs>
+
+## Check it works
+
+```bash
+jpcl --version
+```
+
+Every implementation prints `jpcl 2.0.0` (or newer).
+
+## Versions
+
+| Package | Name | Current |
+| --- | --- | --- |
+| npm | `jpcl-lang` | 2.0.0 |
+| PyPI | `jpcl` | 2.0.0 |
+| Go | `github.com/jpcl-lang/jpcl/go/v2` | v2.0.0 |
+
+Releases are tagged per implementation in the
+[monorepo](https://github.com/jpcl-lang/jpcl): `npm/v2.0.0`, `py/v2.0.0` and
+`go/v2.0.0`.
+
+Coming from 1.x? Comments changed in 2.0. Read
+[Upgrading to 2.0](/guides/upgrading/) first.

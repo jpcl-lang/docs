@@ -1,0 +1,109 @@
+---
+title: Quick start
+description: Read, change and save a .jp file in TypeScript, Python or Go.
+---
+
+import { Tabs, TabItem, Steps } from "@astrojs/starlight/components";
+
+<Steps>
+
+1. Write a config file at `data/servers.jp`:
+
+   ```jp title="data/servers.jp"
+   [SERVER_ID]
+   prefix: "!"
+   config: {
+     disabled_channels:,
+     disabled_users: [9892, 82082, 8209]
+   }
+   ```
+
+2. Check it from the shell:
+
+   ```bash
+   jpcl check data/servers.jp
+   ```
+
+3. Load it, change it and save it:
+
+   <Tabs syncKey="lang">
+     <TabItem label="TypeScript">
+       ```ts
+       import { JPConfig } from "jpcl-lang";
+
+       const cfg = await JPConfig.load("data/servers.jp");
+
+       cfg.getPath("SERVER_ID.prefix");
+       cfg.setPath("SERVER_ID.config.disabled_users", [9892]);
+
+       await cfg.save();
+       ```
+     </TabItem>
+     <TabItem label="Python">
+       ```python
+       from jpcl import JPConfig
+
+       cfg = JPConfig.load("data/servers.jp")
+
+       cfg.get_path("SERVER_ID.prefix")
+       cfg.set_path("SERVER_ID.config.disabled_users", [9892])
+
+       cfg.save()
+       ```
+     </TabItem>
+     <TabItem label="Go">
+       ```go
+       package main
+
+       import (
+           "log"
+
+           jpcl "github.com/jpcl-lang/jpcl/go/v2"
+       )
+
+       func main() {
+           cfg, err := jpcl.LoadJPConfig("data/servers.jp", false, jpcl.ConfigOptions{
+               Write: jpcl.DefaultStringifyOptions(),
+           })
+           if err != nil {
+               log.Fatal(err)
+           }
+
+           cfg.GetPath("SERVER_ID.prefix", nil)
+
+           err = cfg.SetPath("SERVER_ID.config.disabled_users", []any{int64(9892)})
+           if err != nil {
+               log.Fatal(err)
+           }
+
+           if _, err := cfg.Save(""); err != nil {
+               log.Fatal(err)
+           }
+       }
+       ```
+     </TabItem>
+   </Tabs>
+
+4. Look at the result. The writer is deterministic, so this is exactly what
+   every implementation produces:
+
+   ```jp title="data/servers.jp"
+   [SERVER_ID]
+   prefix: "!"
+   config: {
+     disabled_channels:,
+     disabled_users: [9892]
+   }
+   ```
+
+</Steps>
+
+Saving drops comments. See [Round trips](/guides/round-trips/) for everything
+a rewrite changes.
+
+## Next
+
+- [Syntax](/format/syntax/): the whole format in one page.
+- [Editing a config in place](/guides/editing/): dotted paths, sections and
+  merging.
+- [The jpcl command](/cli/): check, format, read and convert from the shell.

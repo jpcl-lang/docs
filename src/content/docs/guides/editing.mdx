@@ -1,0 +1,185 @@
+---
+title: Editing a config in place
+description: JPConfig — a config object that remembers its file, with dotted paths, sections, merging and atomic saves.
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+`JPConfig` wraps a parsed document and remembers the file it came from. It adds
+dotted-path access, section helpers, deep merging and atomic saving.
+
+## Load, or start empty
+
+`missingOk` / `missing_ok` / `missingOK` gives an empty config bound to the
+path when the file does not exist yet. That is what you want for a program that
+writes its config on first run.
+
+<Tabs syncKey="lang">
+  <TabItem label="TypeScript">
+    ```ts
+    import { JPConfig } from "jpcl-lang";
+
+    const cfg = await JPConfig.load("data/servers.jp", { missingOk: true });
+    ```
+
+    `JPConfig.loadSync` does the same without a promise.
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    from jpcl import JPConfig
+
+    cfg = JPConfig.load("data/servers.jp", missing_ok=True)
+    ```
+  </TabItem>
+  <TabItem label="Go">
+    ```go
+    cfg, err := jpcl.LoadJPConfig("data/servers.jp", true, jpcl.ConfigOptions{
+        Write: jpcl.DefaultStringifyOptions(),
+    })
+    ```
+  </TabItem>
+</Tabs>
+
+## Dotted paths
+
+| Operation | TypeScript | Python | Go |
+| --- | --- | --- | --- |
+| Read, with a fallback | `getPath(path, fallback)` | `get_path(path, default)` | `GetPath(path, def)` |
+| Write, creating sections | `setPath(path, value)` | `set_path(path, value)` | `SetPath(path, value)` |
+| Test | `hasPath(path)` | `has_path(path)` | `HasPath(path)` |
+
+Reading a missing path returns the fallback instead of throwing.
+
+<Tabs syncKey="lang">
+  <TabItem label="TypeScript">
+    ```ts
+    cfg.getPath("SERVER_ID.config.disabled_users", []);
+    cfg.setPath("SERVER_ID.config.disabled_users", [9892]);
+    cfg.hasPath("SERVER_ID.prefix");
+    ```
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    cfg.get_path("SERVER_ID.config.disabled_users", [])
+    cfg.set_path("SERVER_ID.config.disabled_users", [9892])
+    cfg.has_path("SERVER_ID.prefix")
+    ```
+  </TabItem>
+  <TabItem label="Go">
+    ```go
+    cfg.GetPath("SERVER_ID.config.disabled_users", []any{})
+    err = cfg.SetPath("SERVER_ID.config.disabled_users", []any{int64(9892)})
+    cfg.HasPath("SERVER_ID.prefix")
+    ```
+  </TabItem>
+</Tabs>
+
+TypeScript and Python accept a custom separator as the last argument (`sep`),
+for keys that contain dots.
+
+## Sections and merging
+
+<Tabs syncKey="lang">
+  <TabItem label="TypeScript">
+    ```ts
+    // Create the section if it is missing
+    cfg.section("NEW_SERVER", { create: true }).prefix = "?";
+
+    // Deep merge, nested objects combined
+    cfg.merge({ SERVER_ID: { modules: { fun: true } } });
+    ```
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    # Create the section if it is missing
+    cfg.section("NEW_SERVER", create=True)["prefix"] = "?"
+
+    # Deep merge, nested dicts combined
+    cfg.merge({"SERVER_ID": {"modules": {"fun": True}}})
+    ```
+  </TabItem>
+  <TabItem label="Go">
+    ```go
+    // Create the section if it is missing
+    section, err := cfg.Section("NEW_SERVER", true)
+    section.Set("prefix", "?")
+
+    // Deep merge: the second argument is deep
+    cfg.Merge(other, true)
+    ```
+  </TabItem>
+</Tabs>
+
+Pass `deep: false` / `deep=False` / `false` to replace top-level keys instead of
+merging into them.
+
+## Save and reload
+
+`save()` writes atomically back to the file the config came from, or to a path
+you pass. `reload()` throws away in-memory changes.
+
+<Tabs syncKey="lang">
+  <TabItem label="TypeScript">
+    ```ts
+    await cfg.save();
+    await cfg.reload();
+
+    // Deep copy as a plain object
+    cfg.toObject();
+    ```
+
+    `saveSync` and `reloadSync` do the same without promises.
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    cfg.save()
+    cfg.reload()
+
+    # Deep copy as a plain dict
+    cfg.to_dict()
+    ```
+  </TabItem>
+  <TabItem label="Go">
+    ```go
+    // "" means the bound path
+    _, err = cfg.Save("")
+    err = cfg.Reload()
+
+    // Deep copy as a plain *Object
+    cfg.ToDict()
+    ```
+  </TabItem>
+</Tabs>
+
+## Formatting options are remembered
+
+Options given when loading are reused by `save()`:
+
+<Tabs syncKey="lang">
+  <TabItem label="TypeScript">
+    ```ts
+    const cfg = await JPConfig.load("data/servers.jp", { indent: 4, sortKeys: true });
+    ```
+
+    `save()` also takes options for a one-off override.
+  </TabItem>
+  <TabItem label="Python">
+    ```python
+    cfg = JPConfig.load("data/servers.jp", indent=4, sort_keys=True)
+    ```
+
+    `save()` also takes options for a one-off override.
+  </TabItem>
+  <TabItem label="Go">
+    ```go
+    opts := jpcl.DefaultStringifyOptions()
+    opts.Indent = 4
+    opts.SortKeys = true
+
+    cfg, err := jpcl.LoadJPConfig("data/servers.jp", false, jpcl.ConfigOptions{Write: opts})
+    ```
+
+    In Go the options are fixed at construction, with no per-call override.
+    Call `jpcl.Dumps(cfg.Data, other)` for a one-off format.
+  </TabItem>
+</Tabs>
